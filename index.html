@@ -1,0 +1,610 @@
+<!DOCTYPE html>
+<html lang="ar" dir="rtl">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>نظام إدارة المبيعات المتكامل</title>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+    <style>
+        :root {
+            --primary-color: #3498db;
+            --secondary-color: #2ecc71;
+            --accent-color: #f39c12;
+            --warning-color: #e74c3c;
+            --light-color: #ecf0f1;
+            --dark-color: #2c3e50;
+            --text-color: #333;
+            --border-radius: 8px;
+            --box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+        }
+        
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+            font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+        }
+        
+        body {
+            background-color: #f5f7fa;
+            color: var(--text-color);
+            display: flex;
+            min-height: 100vh;
+        }
+        
+        /* الشريط الجانبي */
+        .sidebar {
+            width: 250px;
+            background: var(--dark-color);
+            color: white;
+            padding: 20px 0;
+            transition: all 0.3s ease;
+        }
+        
+        .logo {
+            text-align: center;
+            padding: 20px 0;
+            border-bottom: 1px solid rgba(255, 255, 255, 0.1);
+            margin-bottom: 20px;
+        }
+        
+        .logo h2 {
+            font-size: 24px;
+            color: white;
+        }
+        
+        .menu-item {
+            padding: 15px 25px;
+            display: flex;
+            align-items: center;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .menu-item:hover, .menu-item.active {
+            background: rgba(255, 255, 255, 0.1);
+        }
+        
+        .menu-item i {
+            margin-left: 10px;
+            font-size: 18px;
+        }
+        
+        /* المحتوى الرئيسي */
+        .main-content {
+            flex: 1;
+            padding: 20px;
+            overflow-y: auto;
+        }
+        
+        .header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 30px;
+            padding-bottom: 15px;
+            border-bottom: 1px solid #ddd;
+        }
+        
+        .page-title {
+            font-size: 24px;
+            color: var(--dark-color);
+        }
+        
+        .user-info {
+            display: flex;
+            align-items: center;
+        }
+        
+        .user-info img {
+            width: 40px;
+            height: 40px;
+            border-radius: 50%;
+            margin-left: 10px;
+        }
+        
+        /* تصميم واجهة نقاط البيع */
+        .pos-container {
+            display: flex;
+            gap: 20px;
+            height: calc(100vh - 150px);
+        }
+        
+        .products-section {
+            flex: 7;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            overflow-y: auto;
+        }
+        
+        .cart-section {
+            flex: 3;
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+            display: flex;
+            flex-direction: column;
+        }
+        
+        .section-title {
+            font-size: 18px;
+            margin-bottom: 20px;
+            padding-bottom: 10px;
+            border-bottom: 1px solid #eee;
+            color: var(--dark-color);
+        }
+        
+        .products-grid {
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(150px, 1fr));
+            gap: 15px;
+        }
+        
+        .product-card {
+            background: var(--light-color);
+            border-radius: var(--border-radius);
+            padding: 15px;
+            text-align: center;
+            cursor: pointer;
+            transition: transform 0.3s, box-shadow 0.3s;
+        }
+        
+        .product-card:hover {
+            transform: translateY(-5px);
+            box-shadow: var(--box-shadow);
+        }
+        
+        .product-image {
+            width: 80px;
+            height: 80px;
+            object-fit: cover;
+            border-radius: 8px;
+            margin: 0 auto 10px;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: #777;
+        }
+        
+        .product-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .product-price {
+            color: var(--primary-color);
+            font-weight: bold;
+        }
+        
+        .cart-items {
+            flex: 1;
+            overflow-y: auto;
+            margin-bottom: 20px;
+        }
+        
+        .cart-item {
+            display: flex;
+            justify-content: space-between;
+            padding: 10px 0;
+            border-bottom: 1px solid #eee;
+        }
+        
+        .cart-total {
+            font-size: 18px;
+            font-weight: bold;
+            margin: 15px 0;
+            text-align: center;
+            color: var(--dark-color);
+        }
+        
+        .action-buttons {
+            display: flex;
+            flex-direction: column;
+            gap: 10px;
+        }
+        
+        .btn {
+            padding: 12px;
+            border: none;
+            border-radius: var(--border-radius);
+            cursor: pointer;
+            font-weight: bold;
+            transition: all 0.3s;
+            text-align: center;
+        }
+        
+        .btn-primary {
+            background: var(--secondary-color);
+            color: white;
+        }
+        
+        .btn-warning {
+            background: var(--accent-color);
+            color: white;
+        }
+        
+        .btn-danger {
+            background: var(--warning-color);
+            color: white;
+        }
+        
+        .btn:hover {
+            opacity: 0.9;
+            transform: translateY(-2px);
+        }
+        
+        /* تصميم واجهة إدارة العملاء */
+        .crm-container {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .search-bar {
+            display: flex;
+            margin-bottom: 20px;
+            gap: 10px;
+        }
+        
+        .search-bar input {
+            flex: 1;
+            padding: 12px;
+            border: 1px solid #ddd;
+            border-radius: var(--border-radius);
+        }
+        
+        .customer-card {
+            display: flex;
+            align-items: center;
+            padding: 15px;
+            border: 1px solid #eee;
+            border-radius: var(--border-radius);
+            margin-bottom: 15px;
+            cursor: pointer;
+            transition: all 0.3s;
+        }
+        
+        .customer-card:hover {
+            box-shadow: var(--box-shadow);
+        }
+        
+        .customer-image {
+            width: 60px;
+            height: 60px;
+            border-radius: 50%;
+            background: #ddd;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            margin-left: 15px;
+            color: #777;
+        }
+        
+        .customer-info {
+            flex: 1;
+        }
+        
+        .customer-name {
+            font-weight: bold;
+            margin-bottom: 5px;
+        }
+        
+        .customer-points {
+            color: var(--accent-color);
+            font-weight: bold;
+        }
+        
+        /* تصميم واجهة التقارير */
+        .reports-container {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 20px;
+        }
+        
+        .report-card {
+            background: white;
+            border-radius: var(--border-radius);
+            padding: 20px;
+            box-shadow: var(--box-shadow);
+        }
+        
+        .chart-container {
+            height: 250px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            background: #f9f9f9;
+            border-radius: var(--border-radius);
+            margin-top: 15px;
+        }
+        
+        .chart-placeholder {
+            text-align: center;
+            color: #777;
+        }
+        
+        .stats-grid {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+            margin-top: 20px;
+        }
+        
+        .stat-card {
+            background: var(--light-color);
+            padding: 15px;
+            border-radius: var(--border-radius);
+            text-align: center;
+        }
+        
+        .stat-value {
+            font-size: 24px;
+            font-weight: bold;
+            color: var(--primary-color);
+            margin: 10px 0;
+        }
+        
+        .stat-title {
+            color: var(--dark-color);
+        }
+        
+        /* تصميم متجاوب */
+        @media (max-width: 992px) {
+            .pos-container {
+                flex-direction: column;
+            }
+            
+            .reports-container {
+                grid-template-columns: 1fr;
+            }
+            
+            .sidebar {
+                width: 80px;
+            }
+            
+            .menu-item span {
+                display: none;
+            }
+        }
+        
+        @media (max-width: 768px) {
+            .products-grid {
+                grid-template-columns: repeat(2, 1fr);
+            }
+            
+            .stats-grid {
+                grid-template-columns: 1fr;
+            }
+        }
+    </style>
+</head>
+<body>
+    <!-- الشريط الجانبي -->
+    <div class="sidebar">
+        <div class="logo">
+            <h2>نظام المبيعات</h2>
+        </div>
+        <div class="menu-item active">
+            <i class="fas fa-cash-register"></i>
+            <span>نقاط البيع</span>
+        </div>
+        <div class="menu-item">
+            <i class="fas fa-users"></i>
+            <span>إدارة العملاء</span>
+        </div>
+        <div class="menu-item">
+            <i class="fas fa-chart-bar"></i>
+            <span>التقارير</span>
+        </div>
+        <div class="menu-item">
+            <i class="fas fa-cog"></i>
+            <span>الإعدادات</span>
+        </div>
+    </div>
+
+    <!-- المحتوى الرئيسي -->
+    <div class="main-content">
+        <div class="header">
+            <h1 class="page-title">نقاط البيع (POS)</h1>
+            <div class="user-info">
+                <img src="https://ui-avatars.com/api/?name=مدير+المتجر&background=3498db&color=fff" alt="User">
+                <span>مدير المتجر</span>
+            </div>
+        </div>
+
+        <!-- واجهة نقاط البيع -->
+        <div class="pos-container">
+            <div class="products-section">
+                <h2 class="section-title">المنتجات</h2>
+                <div class="products-grid">
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-coffee"></i>
+                        </div>
+                        <div class="product-name">قهوة عربية</div>
+                        <div class="product-price">15 ر.س</div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-mug-hot"></i>
+                        </div>
+                        <div class="product-name">كابتشينو</div>
+                        <div class="product-price">12 ر.س</div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-cookie"></i>
+                        </div>
+                        <div class="product-name">كعكة الشوكولاتة</div>
+                        <div class="product-price">18 ر.س</div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-ice-cream"></i>
+                        </div>
+                        <div class="product-name">آيس كريم</div>
+                        <div class="product-price">10 ر.س</div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-bottle-water"></i>
+                        </div>
+                        <div class="product-name">مياه معدنية</div>
+                        <div class="product-price">5 ر.س</div>
+                    </div>
+                    <div class="product-card">
+                        <div class="product-image">
+                            <i class="fas fa-cookie-bite"></i>
+                        </div>
+                        <div class="product-name">دونات</div>
+                        <div class="product-price">8 ر.س</div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="cart-section">
+                <h2 class="section-title">عربة التسوق</h2>
+                <div class="cart-items">
+                    <div class="cart-item">
+                        <div>قهوة عربية</div>
+                        <div>15 ر.س</div>
+                    </div>
+                    <div class="cart-item">
+                        <div>كعكة الشوكولاتة</div>
+                        <div>18 ر.س</div>
+                    </div>
+                    <div class="cart-item">
+                        <div>مياه معدنية</div>
+                        <div>5 ر.س</div>
+                    </div>
+                </div>
+                <div class="cart-total">المجموع: 38 ر.س</div>
+                <div class="action-buttons">
+                    <button class="btn btn-primary">
+                        <i class="fas fa-money-bill-wave"></i> دفع
+                    </button>
+                    <button class="btn btn-warning">
+                        <i class="fas fa-percent"></i> إضافة خصم
+                    </button>
+                    <button class="btn btn-danger">
+                        <i class="fas fa-times"></i> إلغاء الفاتورة
+                    </button>
+                </div>
+            </div>
+        </div>
+
+        <!-- واجهة إدارة العملاء (مخفية بشكل افتراضي) -->
+        <div class="crm-container" style="display: none;">
+            <h2 class="section-title">إدارة العملاء</h2>
+            <div class="search-bar">
+                <input type="text" placeholder="ابحث عن عميل...">
+                <button class="btn btn-primary">بحث</button>
+            </div>
+            <button class="btn btn-primary" style="margin-bottom: 20px;">
+                <i class="fas fa-plus"></i> إضافة عميل جديد
+            </button>
+            
+            <div class="customer-card">
+                <div class="customer-image">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="customer-info">
+                    <div class="customer-name">أحمد السعدي</div>
+                    <div class="customer-points">نقاط الولاء: 250 نقطة</div>
+                    <div>آخر شراء: 12/05/2023</div>
+                </div>
+            </div>
+            
+            <div class="customer-card">
+                <div class="customer-image">
+                    <i class="fas fa-user"></i>
+                </div>
+                <div class="customer-info">
+                    <div class="customer-name">فاطمة محمد</div>
+                    <div class="customer-points">نقاط الولاء: 500 نقطة</div>
+                    <div>آخر شراء: 10/05/2023</div>
+                </div>
+                <button class="btn btn-warning">استخدام النقاط</button>
+            </div>
+        </div>
+
+        <!-- واجهة التقارير (مخفية بشكل افتراضي) -->
+        <div class="reports-container" style="display: none;">
+            <div class="report-card">
+                <h2 class="section-title">مبيعات اليوم</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-bar" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <p>رسم بياني يظهر مبيعات اليوم</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-card">
+                <h2 class="section-title">المنتجات الأكثر مبيعاً</h2>
+                <div class="chart-container">
+                    <div class="chart-placeholder">
+                        <i class="fas fa-chart-pie" style="font-size: 48px; margin-bottom: 15px;"></i>
+                        <p>رسم بياني دائري للمنتجات الأكثر مبيعاً</p>
+                    </div>
+                </div>
+            </div>
+            
+            <div class="report-card">
+                <h2 class="section-title">إحصائيات سريعة</h2>
+                <div class="stats-grid">
+                    <div class="stat-card">
+                        <div class="stat-title">إجمالي مبيعات اليوم</div>
+                        <div class="stat-value">1,250 ر.س</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">عدد العملاء الجدد</div>
+                        <div class="stat-value">12</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">أكثر المنتجات مبيعاً</div>
+                        <div class="stat-value">قهوة عربية</div>
+                    </div>
+                    <div class="stat-card">
+                        <div class="stat-title">متوسط قيمة الفاتورة</div>
+                        <div class="stat-value">45 ر.س</div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <script>
+        // كود بسيط للتبديل بين الواجهات
+        document.querySelectorAll('.menu-item').forEach(item => {
+            item.addEventListener('click', function() {
+                document.querySelectorAll('.menu-item').forEach(i => i.classList.remove('active'));
+                this.classList.add('active');
+                
+                // إخفاء جميع الواجهات
+                document.querySelector('.pos-container').style.display = 'none';
+                document.querySelector('.crm-container').style.display = 'none';
+                document.querySelector('.reports-container').style.display = 'none';
+                
+                // عرض الواجهة المحددة
+                const index = Array.from(this.parentNode.children).indexOf(this);
+                if(index === 0) {
+                    document.querySelector('.pos-container').style.display = 'flex';
+                    document.querySelector('.page-title').textContent = 'نقاط البيع (POS)';
+                } else if(index === 1) {
+                    document.querySelector('.crm-container').style.display = 'block';
+                    document.querySelector('.page-title').textContent = 'إدارة العملاء (CRM)';
+                } else if(index === 2) {
+                    document.querySelector('.reports-container').style.display = 'grid';
+                    document.querySelector('.page-title').textContent = 'التقارير والتحليلات';
+                }
+            });
+        });
+    </script>
+</body>
+</html>
